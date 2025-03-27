@@ -1,0 +1,2 @@
+SESSION_SECRET=Sessao Secreta
+DB_PASS_LOCAL=Palavra Pass de MariaDB
