@@ -1,0 +1,61 @@
+<div class="pt-4 pb-4">
+  <h1 class="fs-4">Efetue o Registo de Conta</h1>
+</div>
+
+<form id="setUpAccount-form" action="createAccount" method="POST">
+  <div>
+    <label for="Utilizador_nome">Nome:</label>
+    <input
+      name="Utilizador_nome"
+      id="Utilizador_nome"
+      type="text"
+      class="form-control"
+      required
+    />
+  </div>
+
+  <br />
+
+  <div>
+    <label for="telemovel_string">Telemóvel:</label>
+    <input
+      name="telemovel_string"
+      id="telemovel_string"
+      type="tel"
+      pattern="[0-9]{9}"
+      class="form-control"
+    />
+  </div>
+
+  <br />
+
+  <div>
+    <label for="Utilizador_senha">Senha:</label>
+    <input
+      name="Utilizador_senha"
+      id="Utilizador_senha"
+      type="password"
+      class="form-control"
+      required
+    />
+  </div>
+
+  <br />
+
+  <div>
+    <label for="Password2">Por Favor Repita a Senha:</label>
+    <input
+      id="Password2"
+      name="Password2"
+      type="password"
+      class="form-control"
+      required
+    />
+  </div>
+
+  <br />
+
+  <div>
+    <button type="submit" class="btn btn-secondary">Registar</button>
+  </div>
+</form>

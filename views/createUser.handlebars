@@ -1,0 +1,51 @@
+<div class="pt-4 pb-4">
+  <h1 class="fs-4">Adicionar Utilizador</h1>
+</div>
+
+<form id="userCriation-form" action="/utilizadores/send-email" method="POST">
+  <div>
+    <label for="Utilizador_email">Endereço de Email:</label>
+    <input
+      id="Utilizador_email"
+      name="Utilizador_email"
+      type="email"
+      class="form-control"
+      required
+    />
+  </div>
+
+  <br />
+
+  <div>
+    <label for="Utilizador_cargo">Cargo:</label>
+    <input
+      name="Utilizador_cargo"
+      id="Utilizador_cargo"
+      type="text"
+      class="form-control"
+      required
+    />
+  </div>
+
+  <br />
+
+  <div class="form-check form-switch">
+    <label
+      for="checkbox_user_tipo"
+      class="form-check-label"
+    >Administrador:</label>
+    <input
+      id="checkbox_user_tipo"
+      name="checkbox_user_tipo"
+      type="checkbox"
+      class="form-check-input"
+    />
+  </div>
+
+  <br />
+
+  <div>
+    <button type="submit" class="btn btn-secondary">Submeter</button>
+  </div>
+
+</form>

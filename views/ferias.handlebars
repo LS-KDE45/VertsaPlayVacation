@@ -1,0 +1,46 @@
+<div class="pt-4 pb-4">
+  <h1 class="fs-4">Ferias Marcadas</h1>
+</div>
+<div class="Feriasinfo">
+  {{#if ferias}}
+    <table class="table">
+      <tr>
+        <td>Ferias ID</td>
+        <td>Ferias Inicio</td>
+        <td>Ferias Fim</td>
+        {{#if tipo}}
+          <td>Utilizador ID</td>
+          <td>Utilizador Nome</td>
+          <td>Utilizador Email</td>
+        {{/if}}
+      </tr>
+      {{#each ferias}}
+        <tr>
+          <td>{{Ferias_ID}}</td>
+          <td>{{Ferias_data_inicio}}</td>
+          <td>{{Ferias_data_fim}}</td>
+          <td>{{lookup ../utilizadoresID @index}}</td>
+          <td>{{lookup ../utilizadoresnome @index}}</td>
+          <td>{{lookup ../utilizadoresemail @index}}</td>
+          <!--
+
+          {{#with (lookup ../utilizadoresData [@index])}}
+            <td>{{Utilizador_ID}}</td>
+            <td>{{Utilizador_nome}}</td>
+            <td>{{Utilizador_email}}</td>
+          {{/with}}
+
+
+          {{#each Utilizadore}}
+            <td>{{Utilizador_ID}}</td>
+            <td>{{Utilizador_nome}}</td>
+            <td>{{Utilizador_email}}</td>
+          {{/each}}
+          -->
+        </tr>
+      {{/each}}
+    </table>
+  {{else}}
+    <p id="Feriasp">Sem Ferias</p>
+  {{/if}}
+</div>

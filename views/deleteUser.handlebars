@@ -1,0 +1,29 @@
+<div class="pt-4 pb-4">
+  <h1 class="fs-4">Remova um Utilizador</h1>
+</div>
+
+<table class="table">
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Email</th>
+    <th></th>
+  </tr>
+  {{#each Utilizador}}
+    <tr>
+      <td>{{Utilizador_ID}}</td>
+      <td>{{Utilizador_nome}}</td>
+      <td>{{Utilizador_email}}</td>
+      <td>
+        <form action="deleteUser" method="POST">
+          <input type="hidden" name="Utilizador_ID" value="{{Utilizador_ID}}" />
+          <button
+            type="submit"
+            onclick="return confirm('Are you sure?')"
+            class="btn btn-danger"
+          >Remover</button>
+        </form>
+      </td>
+    </tr>
+  {{/each}}
+</table>

@@ -1,0 +1,35 @@
+<div class="pt-4 pb-4">
+  <h1 class="fs-4">Login</h1>
+</div>
+
+<form id="login-form" action="/utilizadores/login" method="POST">
+  <div>
+    <label for="Utilizador_email">Email Adress:</label>
+    <input
+      id="Utilizador_email"
+      name="Utilizador_email"
+      type="email"
+      class="form-control"
+      required
+    />
+  </div>
+
+  <br />
+
+  <div>
+    <label for="Utilizador_senha">Password:</label>
+    <input
+      name="Utilizador_senha"
+      id="Utilizador_senha"
+      type="password"
+      class="form-control"
+      required
+    />
+  </div>
+
+  <br />
+
+  <div>
+    <button class="btn btn-secondary">Login</button>
+  </div>
+</form>

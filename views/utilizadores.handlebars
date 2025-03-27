@@ -1,0 +1,32 @@
+<div class="pt-4 pb-4">
+  <h1 class="fs-4">Utilizadores Registados</h1>
+</div>
+<div class="Utilizadorinfo">
+  {{#if Utilizador}}
+    <table class="table">
+      <tr>
+        <td>Utilizador ID</td>
+        <td>Nome</td>
+        <td>Email</td>
+        <td>Telemóvel</td>
+        <td>Cargo</td>
+        <td>Administrador</td>
+      </tr>
+      {{#each Utilizador}}
+        <tr>
+          <td>{{Utilizador_ID}}</td>
+          <td>{{Utilizador_nome}}</td>
+          <td>{{Utilizador_email}}</td>
+          {{#if Utilizador_telemovel}}
+            <td>{{Utilizador_telemovel}}</td>
+          {{else}}
+            <td>N/A</td>
+          {{/if}}
+          <td>{{Utilizador_cargo}}</td>
+          <td>{{Utilizador_tipo}}</td>
+        </tr>
+      {{/each}}
+    </table>
+  {{else}}
+    <p id="Utilizadorp">Sem Utilizadores</p>
+  {{/if}}

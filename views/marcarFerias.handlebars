@@ -1,0 +1,36 @@
+<div class="pt-4 pb-4">
+  <h1 class="fs-4">Marcação de Férias</h1>
+</div>
+
+<form id="Ferias-form" action="/ferias/marcarFerias" method="POST">
+  <div>
+    <label for="Ferias_data_inicio">Data de início de férias:</label>
+    <input
+      type="date"
+      id="Ferias_data_inicio"
+      name="Ferias_data_inicio"
+      class="form-control"
+      required
+    />
+  </div>
+
+  <br />
+
+  <div>
+    <label for="Ferias_data_fim">Data de fim de férias:</label>
+    <input
+      type="date"
+      id="Ferias_data_fim"
+      name="Ferias_data_fim"
+      class="form-control"
+      required
+    />
+  </div>
+
+  <br />
+
+  <div>
+    <button class="btn btn-secondary">Marcar</button>
+    <input type="submit" value="Send" />
+  </div>
+</form>
