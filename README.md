@@ -38,7 +38,7 @@ npm install cors
 Quando se incia o website aparece a página principal que não apresenta nehnuma informação relevante, no entanto no cabeçalho aparece a opção de Login onde, caso não tenha sido criado nenhum utilizador é necessário usar as seguintes credenciais:
 
 - Email: `admin@gmail.com`
-- Senha: `admin`
+- Senha: `admin`  
   Depois de efetuar o login já é possível utilizar todas as funcionalidades implementadas.
 
 ### Funcionalidade das Páginas
