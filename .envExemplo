@@ -1,2 +1,4 @@
 SESSION_SECRET=Sessao Secreta
 DB_PASS_LOCAL=Palavra Pass de MariaDB
+EMAIL=Email 
+APP_PASSWORD=Palavra Pass de App

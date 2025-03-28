@@ -1,16 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const Utilizadores = require("../models/Utilizadores.js");
-const { v4: uuidv4 } = require("uuid"); // Generate unique tokens
+const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { FORCE } = require("sequelize/lib/index-hints");
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 
+//Renderizar a pagina login
 router.get("/login", (req, res) => res.render("login"));
 
+//Renderizar a pagina para adicionar um utilizador
 router.get("/createUser", (req, res) => res.render("createUser"));
 
+//Renderizar a pagina para mostrar todos os utilizadores
 router.get("/showUsers", (req, res) =>
   Utilizadores.findAll({ raw: true })
     .then((Utilizador) => {
@@ -21,6 +26,7 @@ router.get("/showUsers", (req, res) =>
     .catch((err) => console.error("Error: " + err))
 );
 
+//Renderizar a página para apagar utilizadores
 router.get("/deleteUsers", (req, res) =>
   Utilizadores.findAll({ raw: true })
     .then((Utilizador) => {
@@ -31,6 +37,7 @@ router.get("/deleteUsers", (req, res) =>
     .catch((err) => console.error("Error: " + err))
 );
 
+//Apaga os dados da sessão e renderiza a página de login
 router.get("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -41,111 +48,7 @@ router.get("/logout", (req, res) => {
   });
 });
 
-// Email-sending route
-router.post("/send-email", async (req, res) => {
-  console.log("/sendemail");
-  const { Utilizador_email, Utilizador_cargo, checkbox } = req.body;
-  let Utilizador_tipo = req.body.checkbox_user_tipo ? 1 : 0;
-
-  try {
-    // Hash a temporary password
-    const temporaryPassword = await bcrypt.hash(uuidv4(), 10);
-    const temporaryName = "John Doe";
-
-    console.log({
-      Utilizador_email,
-      temporaryName,
-      Utilizador_cargo,
-      temporaryPassword,
-      Utilizador_tipo,
-    });
-
-    // Insert the user into the database with isConfirmed = false
-    let user = await Utilizadores.findOne({
-      where: { Utilizador_email: Utilizador_email },
-    });
-
-    if (!user) {
-      Utilizadores.create({
-        Utilizador_email,
-        Utilizador_nome: temporaryName,
-        Utilizador_cargo,
-        Utilizador_senha: temporaryPassword,
-        Utilizador_tipo,
-      });
-    } else {
-      return res.render("createUser", { errorMessage: "Utilizador já existe" });
-    }
-    // Generate a secure confirmation token (expires in 1 hour)
-    const token = jwt.sign(
-      { Utilizador_email: Utilizador_email },
-      process.env.SESSION_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    // Confirmation link
-    const confirmationLink = `http://localhost:3000/utilizadores/setUpAccount?token=${token}`;
-
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: "luisqueiros21@gmail.com",
-        pass: "exws vrnn hmit juit",
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-
-    // Email options
-    const mailOptions = {
-      from: "luisqueiros21@gmail.com",
-      to: Utilizador_email,
-      subject: `Criação de conta na Vertsa Play`,
-      text: `Olá,\n\nCarrega no link em baixo para terminar a configuração da conta na Vertsa Play:\n\n${confirmationLink}\n\nEste link expira dentro de 1 hora.\n\nMelhores Cumprimentos.`,
-    };
-
-    // Send the email
-    await transporter.sendMail(mailOptions);
-    //MENSAGEM NÃO É DE ERRO
-    res.render("index", { errorMessage: "Email enviado" });
-  } catch (error) {
-    console.error("Error sending email:", error);
-    res.render("createUser", { errorMessage: "Erro a enviar email" });
-  }
-});
-
-router.post("/login", async (req, res) => {
-  try {
-    const user = await Utilizadores.findOne({
-      where: { Utilizador_email: req.body.Utilizador_email },
-    });
-    if (user === null) {
-      res.render("login", { errorMessage: "Utilizador não encontrado" });
-    } else {
-      if (
-        await bcrypt.compare(req.body.Utilizador_senha, user.Utilizador_senha)
-      ) {
-        req.session.user = {
-          ID: user.Utilizador_ID,
-          email: user.Utilizador_email,
-          nome: user.Utilizador_nome,
-          tipo: user.Utilizador_tipo,
-        };
-        res.redirect("../");
-        console.log("Success");
-      } else {
-        res.render("login", { errorMessage: "Email ou senha errada" });
-      }
-    }
-  } catch (error) {
-    console.error(error);
-    res.render("login", { errorMessage: "Erro a efetuar o login" });
-  }
-});
-
+//Renderiza a página para acabar de criar a conta e verifica o token
 router.get("/setUpAccount", async (req, res) => {
   const { token } = req.query;
 
@@ -175,6 +78,125 @@ router.get("/setUpAccount", async (req, res) => {
   }
 });
 
+//Pesquisa por nome dos utilizadores
+router.get("/search", async (req, res) => {
+  let { search } = req.query;
+
+  search.toLowerCase();
+
+  Utilizadores.findAll({
+    where: { Utilizador_nome: { [Op.like]: "%" + search + "%" } },
+    raw: true,
+  })
+    .then((Utilizador) => res.render("utilizadores", { Utilizador }))
+    .catch((err) =>
+      res.render("utilizadores", { errorMessage: "Erro na pesquisa" })
+    );
+});
+
+// Envia um email para o novo utilizador e cria uma versão temporária do utilizador na base de dados
+router.post("/send-email", async (req, res) => {
+  console.log("/sendemail");
+  const { Utilizador_email, Utilizador_cargo, checkbox } = req.body;
+  let Utilizador_tipo = req.body.checkbox_user_tipo ? 1 : 0;
+
+  try {
+    const temporaryPassword = await bcrypt.hash(uuidv4(), 10);
+    const temporaryName = "John Doe";
+
+    console.log({
+      Utilizador_email,
+      temporaryName,
+      Utilizador_cargo,
+      temporaryPassword,
+      Utilizador_tipo,
+    });
+
+    let user = await Utilizadores.findOne({
+      where: { Utilizador_email: Utilizador_email },
+    });
+
+    if (!user) {
+      Utilizadores.create({
+        Utilizador_email,
+        Utilizador_nome: temporaryName,
+        Utilizador_cargo,
+        Utilizador_senha: temporaryPassword,
+        Utilizador_tipo,
+      });
+    } else {
+      return res.render("createUser", { errorMessage: "Utilizador já existe" });
+    }
+    // Gera um token (expira em 1 hora)
+    const token = jwt.sign(
+      { Utilizador_email: Utilizador_email },
+      process.env.SESSION_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const confirmationLink = `http://localhost:3000/utilizadores/setUpAccount?token=${token}`;
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.APP_PASSWORD,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: Utilizador_email,
+      subject: `Criação de conta na Vertsa Play`,
+      text: `Olá,\n\nCarrega no link em baixo para terminar a configuração da conta na Vertsa Play:\n\n${confirmationLink}\n\nEste link expira dentro de 1 hora.\n\nMelhores Cumprimentos.`,
+    };
+
+    // Envio de email
+    await transporter.sendMail(mailOptions);
+    //MENSAGEM NÃO É DE ERRO
+    res.render("index", { errorMessage: "Email enviado" });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.render("createUser", { errorMessage: "Erro a enviar email" });
+  }
+});
+
+//Compara a informação para login este método é post devido à segurança do envio da password
+router.post("/login", async (req, res) => {
+  try {
+    const user = await Utilizadores.findOne({
+      where: { Utilizador_email: req.body.Utilizador_email },
+    });
+    if (user === null) {
+      res.render("login", { errorMessage: "Utilizador não encontrado" });
+    } else {
+      if (
+        await bcrypt.compare(req.body.Utilizador_senha, user.Utilizador_senha)
+      ) {
+        req.session.user = {
+          ID: user.Utilizador_ID,
+          email: user.Utilizador_email,
+          nome: user.Utilizador_nome,
+          tipo: user.Utilizador_tipo,
+        };
+        res.redirect("../");
+        console.log("Success");
+      } else {
+        res.render("login", { errorMessage: "Email ou senha errada" });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    res.render("login", { errorMessage: "Erro a efetuar o login" });
+  }
+});
+
+//Envia a informação para a base de dados da nova conta criada
 router.post("/createAccount", async (req, res) => {
   let { Utilizador_nome, telemovel_string, Utilizador_senha, Password2 } =
     req.body;
@@ -196,7 +218,6 @@ router.post("/createAccount", async (req, res) => {
         // Verify token
         const decoded = jwt.verify(token, process.env.SESSION_SECRET);
 
-        // Find organization by email
         const user = await Utilizadores.findOne({
           where: { Utilizador_email: decoded.Utilizador_email },
         });
@@ -207,7 +228,7 @@ router.post("/createAccount", async (req, res) => {
           });
         }
 
-        // Hash password before saving
+        // Cria um Hash da password para colocar na base de dados
         const hashedPassword = await bcrypt.hash(Utilizador_senha, 10);
 
         // Update password in database
@@ -240,6 +261,7 @@ router.post("/createAccount", async (req, res) => {
   }
 });
 
+//Elimina o utilizador selecionado da base de dados
 router.post("/deleteUser", async (req, res) => {
   try {
     let user = await Utilizadores.findOne({
@@ -255,6 +277,7 @@ router.post("/deleteUser", async (req, res) => {
   }
 });
 
+//Verifica se a password é forte
 function isPasswordStrong(password) {
   return (
     password.length > 6 &&

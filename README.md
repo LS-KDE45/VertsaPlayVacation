@@ -30,7 +30,9 @@ npm install
 npm install cors
 ```
 
-- Criar um ficheiro na pasta do repositório com o nome `.env` e copiar o conteúdo do ficheiro `.envExemplo` e trocar DB_PASS_LOCAL pela palavra pass definida na instalação de MariaDB, por fim executar na cmd `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"` e trocar SESSION_SECRET pelo valor obtido no comando anterior, isto garante que a informação da sessão esteja mais segura.
+- É também necessário configurar a conta google para permitir envios automáticos de emails, para isso é necessário criar uma password de app que é possível ser feito a partir da [página oficial do Google](https://support.google.com/accounts/answer/185833?hl=en) em Create and manage your app passwords.
+
+- Por fim, é necessário criar um ficheiro na pasta do repositório com o nome `.env` e copiar o conteúdo do ficheiro `.envExemplo` e trocar DB_PASS_LOCAL pela palavra pass definida na instalação de MariaDB, EMAIL pelo seu email, APP_PASSWORD pela password de aplicação adquirida em cima, por fim executar na cmd `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"` e trocar SESSION_SECRET pelo valor obtido no comando anterior, isto garante que a informação da sessão esteja mais segura.
 - Para iniciar o website apenas é necessário executar o comando `npm start` e aceder ao link mencionado na consola: `http://localhost:3000`.
 
 ## Utilização
@@ -44,7 +46,7 @@ Quando se incia o website aparece a página principal que não apresenta nehnuma
 ### Funcionalidade das Páginas
 
 1. Mostrar Utilizadores
-   - Esta página mostra toda a informação relevante de todos os utilizadores registados.
+   - Esta página mostra toda a informação relevante de todos os utilizadores registados, também é possível fazer uma pesquisa por nome.
 2. Mostrar Férias
    - Esta página mostra uma tabela com as datas de férias marcadas, para um utilizador admin mostra todas as férias marcadas por todos os utilizadores incluindo informação dos mesmos como o nome e email, para um utilizador normal apenas mostra as datas das suas férias.
 3. Marcar Férias

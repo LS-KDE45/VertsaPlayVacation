@@ -1,7 +1,14 @@
 <div class="pt-4 pb-4">
   <h1 class="fs-4">Utilizadores Registados</h1>
 </div>
-<div class="Utilizadorinfo">
+
+<div>
+  <form class="form-control" action="/utilizadores/search" method="GET">
+    <input type="search" placeholder="Procura por Nome" name="search">
+    <button class="btn btn-success">Search</button>
+  </form>
+</div>
+<div>
   {{#if Utilizador}}
     <table class="table">
       <tr>
@@ -32,5 +39,5 @@
       {{/each}}
     </table>
   {{else}}
-    <p id="Utilizadorp">Sem Utilizadores</p>
+    <p>Sem Utilizadores</p>
   {{/if}}
