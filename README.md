@@ -16,7 +16,7 @@ O projeto utiliza **Node.js** e **Express** para criar uma API, **MariaDB** para
 Para facilitar a instalação do projeto basta seguir os seguintes passos:
 
 - No final da instalação de MariaDB, executar o ficheiro sql presente no repositório, se estiver a utilizar HeidiSQL apenas vá a Ficheiro -> Executar Ficheiro SQL... , selecione o ficheiro sql presente no repositório e por fim atualize as bases de dados mostradas com a tecla `f5`.
-- No Visual Studio Code na pasta do repositório, abrir um terminal da cmd e executar os comandos:
+- No Visual Studio Code, na pasta do repositório, abra um terminal da cmd e execute os seguintes comandos:
 
 1. Instalar as dependências necessárias
 
