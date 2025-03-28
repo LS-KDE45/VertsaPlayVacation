@@ -3,8 +3,8 @@
 </div>
 
 <form id="setUpAccount-form" action="createAccount" method="POST">
-  <div>
-    <label for="Utilizador_nome">Nome:</label>
+  <div class="form-group required">
+    <label for="Utilizador_nome" class="control-label">Nome:</label>
     <input
       name="Utilizador_nome"
       id="Utilizador_nome"
@@ -29,8 +29,8 @@
 
   <br />
 
-  <div>
-    <label for="Utilizador_senha">Senha:</label>
+  <div class="form-group required">
+    <label for="Utilizador_senha" class="control-label">Senha:</label>
     <input
       name="Utilizador_senha"
       id="Utilizador_senha"
@@ -42,8 +42,8 @@
 
   <br />
 
-  <div>
-    <label for="Password2">Por Favor Repita a Senha:</label>
+  <div class="form-group required">
+    <label for="Password2" class="control-label">Por Favor Repita a Senha:</label>
     <input
       id="Password2"
       name="Password2"
@@ -59,3 +59,9 @@
     <button type="submit" class="btn btn-secondary">Registar</button>
   </div>
 </form>
+
+{{#if errorMessage}}
+  <script>
+    window.onload = function () { alert("{{errorMessage}}"); }
+  </script>
+{{/if}}

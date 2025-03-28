@@ -33,3 +33,9 @@
     <button class="btn btn-secondary">Login</button>
   </div>
 </form>
+
+{{#if errorMessage}}
+  <script>
+    window.onload = function () { alert("{{errorMessage}}"); }
+  </script>
+{{/if}}

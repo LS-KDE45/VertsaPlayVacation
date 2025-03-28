@@ -18,7 +18,7 @@ router.get("/showUsers", (req, res) =>
         Utilizador,
       });
     })
-    .catch((err) => console.log("Error: " + err))
+    .catch((err) => console.error("Error: " + err))
 );
 
 router.get("/deleteUsers", (req, res) =>
@@ -28,8 +28,18 @@ router.get("/deleteUsers", (req, res) =>
         Utilizador,
       });
     })
-    .catch((err) => console.log("Error: " + err))
+    .catch((err) => console.error("Error: " + err))
 );
+
+router.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Erro ao encerrar sessão:", err);
+      return res.render("login", { errorMessage: "Erro ao encerrar sessão" });
+    }
+    res.redirect("/utilizadores/login");
+  });
+});
 
 // Email-sending route
 router.post("/send-email", async (req, res) => {
@@ -64,7 +74,7 @@ router.post("/send-email", async (req, res) => {
         Utilizador_tipo,
       });
     } else {
-      return res.status(400).json({ error: "User already exists." });
+      return res.render("createUser", { errorMessage: "Utilizador já existe" });
     }
     // Generate a secure confirmation token (expires in 1 hour)
     const token = jwt.sign(
@@ -75,21 +85,6 @@ router.post("/send-email", async (req, res) => {
 
     // Confirmation link
     const confirmationLink = `http://localhost:3000/utilizadores/setUpAccount?token=${token}`;
-
-    // Configure the SMTP transporter
-    /*const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: "queirossluiss@gmail.com",
-        pass: "xcom jqxp bvoy ezvl",
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-    */
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -114,21 +109,21 @@ router.post("/send-email", async (req, res) => {
 
     // Send the email
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: "Email sent successfully!" });
+    //MENSAGEM NÃO É DE ERRO
+    res.render("index", { errorMessage: "Email enviado" });
   } catch (error) {
     console.error("Error sending email:", error);
-    res.status(500).json({ error: "Failed to send email." });
+    res.render("createUser", { errorMessage: "Erro a enviar email" });
   }
 });
 
 router.post("/login", async (req, res) => {
   try {
-    // Find organization by email
     const user = await Utilizadores.findOne({
       where: { Utilizador_email: req.body.Utilizador_email },
     });
     if (user === null) {
-      res.status(400).send("User not found");
+      res.render("login", { errorMessage: "Utilizador não encontrado" });
     } else {
       if (
         await bcrypt.compare(req.body.Utilizador_senha, user.Utilizador_senha)
@@ -142,12 +137,12 @@ router.post("/login", async (req, res) => {
         res.redirect("../");
         console.log("Success");
       } else {
-        console.log("Your Email or password was incorrect");
+        res.render("login", { errorMessage: "Email ou senha errada" });
       }
     }
   } catch (error) {
     console.error(error);
-    res.status(400).send("Invalid password.");
+    res.render("login", { errorMessage: "Erro a efetuar o login" });
   }
 });
 
@@ -155,34 +150,28 @@ router.get("/setUpAccount", async (req, res) => {
   const { token } = req.query;
 
   if (!token) {
-    return res.status(400).send("Invalid or missing confirmation token.");
+    return res.render("index", {
+      errorMessage: "Token em falta, por favor aceda ao link novamente",
+    });
   }
 
   try {
     // Verify token
     const decoded = jwt.verify(token, process.env.SESSION_SECRET);
 
-    // Find organization by email
     const user = await Utilizadores.findOne({
       where: { Utilizador_email: decoded.Utilizador_email },
     });
 
     if (!user) {
-      return res.status(400).send("User not found or already confirmed.");
+      return res.render("index", { errorMessage: "Utilizador não encontrado" });
     }
 
-    // Mark user as confirmed
-    //await org.update({ isConfirmed: true });
-
-    // Store token in session to prevent tampering
     req.session.resetToken = token;
     res.render("setUpAccount");
-
-    // Redirect to password setup page (no email in URL)
-    //res.redirect("/set-password");
   } catch (error) {
     console.error(error);
-    res.status(400).send("Invalid or expired token.");
+    res.render("index", { errorMessage: "Invalid or expired token." });
   }
 });
 
@@ -190,51 +179,64 @@ router.post("/createAccount", async (req, res) => {
   let { Utilizador_nome, telemovel_string, Utilizador_senha, Password2 } =
     req.body;
 
-  if (Utilizador_senha == Password2) {
-    // Get token from session (not from URL)
-    const token = req.session.resetToken;
-    if (!token) {
-      return res.status(400).send("Invalid or missing reset token.");
-    }
-    telemovel_string = telemovel_string.trim();
-    const Utilizador_telemovel =
-      telemovel_string === "" ? null : telemovel_string;
-
-    try {
-      // Verify token
-      const decoded = jwt.verify(token, process.env.SESSION_SECRET);
-
-      // Find organization by email
-      const user = await Utilizadores.findOne({
-        where: { Utilizador_email: decoded.Utilizador_email },
-      });
-
-      if (!user) {
-        return res.status(400).send("User not found.");
+  if (isPasswordStrong(Utilizador_senha)) {
+    if (Utilizador_senha == Password2) {
+      // Get token from session (not from URL)
+      const token = req.session.resetToken;
+      if (!token) {
+        return res.render("index", {
+          errorMessage: "Token em falta, por favor aceda ao link novamente",
+        });
       }
+      telemovel_string = telemovel_string.trim();
+      const Utilizador_telemovel =
+        telemovel_string === "" ? null : telemovel_string;
 
-      // Hash password before saving
-      const hashedPassword = await bcrypt.hash(Utilizador_senha, 10);
+      try {
+        // Verify token
+        const decoded = jwt.verify(token, process.env.SESSION_SECRET);
 
-      // Update password in database
-      await user.update({
-        Utilizador_nome,
-        Utilizador_telemovel,
-        Utilizador_senha: hashedPassword,
-      });
+        // Find organization by email
+        const user = await Utilizadores.findOne({
+          where: { Utilizador_email: decoded.Utilizador_email },
+        });
 
-      // Clear token from session to prevent reuse
-      req.session.resetToken = null;
+        if (!user) {
+          return res.render("index", {
+            errorMessage: "Utilizador não encontrado",
+          });
+        }
 
-      res.status(200).json({ message: "Password updated successfully!" });
-    } catch (error) {
-      console.error(error);
-      res.status(400).send("Invalid or expired token.");
+        // Hash password before saving
+        const hashedPassword = await bcrypt.hash(Utilizador_senha, 10);
+
+        // Update password in database
+        await user.update({
+          Utilizador_nome,
+          Utilizador_telemovel,
+          Utilizador_senha: hashedPassword,
+        });
+
+        // Clear token from session to prevent reuse
+        req.session.resetToken = null;
+
+        res.redirect("../");
+      } catch (error) {
+        console.error(error);
+        return res.render("index", {
+          errorMessage: "Erro, por favor aceda ao link novamente",
+        });
+      }
+    } else {
+      return res
+        .status(400)
+        .render("setUpAccount", { errorMessage: "Passwords do not match" });
     }
   } else {
-    return res
-      .status(400)
-      .render("setUpAccount", { error: "Passwords do not match" });
+    res.render("setUpAccount", {
+      errorMessage:
+        "Senha tem de ter mais de 6 caracteres, uma letra maiúcula, uma letra minúscula e um número",
+    });
   }
 });
 
@@ -245,12 +247,21 @@ router.post("/deleteUser", async (req, res) => {
     });
     if (user) {
       await user.destroy();
-      res.render("index");
+      res.redirect("/utilizadores/showUsers");
     }
   } catch (error) {
     console.error("Erro a remover utilizador:", error);
-    res.status(500).json({ error: "Erro a remover utilizador." });
+    res.render("deleteUser", { errorMessage: "Erro a remover utilizador." });
   }
 });
+
+function isPasswordStrong(password) {
+  return (
+    password.length > 6 &&
+    password.match(/[a-z]+/) &&
+    password.match(/[A-Z]+/) &&
+    password.match(/[0-9]+/)
+  );
+}
 
 module.exports = router;

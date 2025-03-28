@@ -9,7 +9,7 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
-    <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" /> -->
+    <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
     <nav class="navbar navbar-expand navbar-dark bg-dark">
@@ -55,10 +55,15 @@
                   class="nav-link"
                 >Remover Utilizadores</a></li>
             {{/if}}
+            <li class="nav-item ms-auto ps-2"><a
+                href="/utilizadores/logout"
+                class="nav-link"
+              >Logout</a></li>
           {{/if}}
         </ul>
         {{#if nome}}
-          <span class="navbar-text" id="listname">Bem Vindo, {{nome}}!</span>
+          <span class="navbar-text" id="listname">Bem Vindo,
+            {{nome}}!</span>
         {{/if}}
       </div>
     </nav>

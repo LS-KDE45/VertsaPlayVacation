@@ -6,17 +6,6 @@ const Utilizadores = require("../models/Utilizadores.js");
 router.get("/marcarFerias", (req, res) => res.render("marcarFerias"));
 
 router.get("/showFerias", async (req, res) => {
-  /*Ferias.findAll({ raw: true })
-    .then((F) => {
-      Utilizadores.findOne({ where: {Utilizador_ID: F.Utilizador_ID}})
-      .then((Utilizador) => {
-        res.render("ferias", {
-          F,Utilizador
-        });
-      })
-    })
-    .catch((err) => console.log("Error: " + err));
-    */
   if (req.session.user.tipo) {
     //MOSTRA TODAS AS FERIAS
     try {
@@ -39,7 +28,6 @@ router.get("/showFerias", async (req, res) => {
       const utilizadoresID = utilizadoresData.map((u) => u.Utilizador_ID);
       const utilizadoresnome = utilizadoresData.map((u) => u.Utilizador_nome);
       const utilizadoresemail = utilizadoresData.map((u) => u.Utilizador_email);
-      console.log("Ferias table:" + JSON.stringify(utilizadoresData[0]));
       res.render("ferias", {
         ferias,
         utilizadoresID,
@@ -47,43 +35,78 @@ router.get("/showFerias", async (req, res) => {
         utilizadoresemail,
         tipo: req.session.user.tipo,
       });
-      /*
-      res.render("ferias", {
-        ferias: ferias.map((f) => ({
-          Ferias_ID: f.Ferias_ID,
-          Ferias_data_inicio: f.Ferias_data_inicio,
-          Ferias_data_fim: f.Ferias_data_fim,
-          Utilizadore: [f.Utilizadore],
-        })),
-        tipo: req.session.user.tipo,
-      });*/
     } catch (err) {
       console.error("Error: " + err);
+      res.render("ferias", { errorMessage: "Erro a mostrar férias" });
     }
   } else {
     //MOSTRAS AS FERIAS DO USER ATUAL
-    Ferias.findAll({ where: { Utilizador_ID: req.session.user.ID } })
+    Ferias.findAll({ where: { Utilizador_ID: req.session.user.ID }, raw: true })
       .then((ferias) => {
         res.render("ferias", { ferias, tipo: req.session.user.tipo });
       })
       .catch((err) => {
         console.log("Error: " + err);
-        res.render("ferias");
+        res.render("ferias", { errorMessage: "Erro a mostrar férias" });
       });
   }
 });
 
 router.post("/marcarFerias", async (req, res) => {
   const { Ferias_data_inicio, Ferias_data_fim } = req.body;
-  try {
-    Ferias.create({
-      Utilizador_ID: req.session.user.ID,
-      Ferias_data_inicio,
-      Ferias_data_fim,
+  if (isDateValid(Ferias_data_inicio, null)) {
+    if (isDateValid(Ferias_data_inicio, Ferias_data_fim)) {
+      try {
+        Ferias.create({
+          Utilizador_ID: req.session.user.ID,
+          Ferias_data_inicio,
+          Ferias_data_fim,
+        });
+        res.redirect("/ferias/showFerias");
+      } catch (error) {
+        console.error(error);
+        res.render("marcarFerias", { errorMessage: "Erro a marcar férias" });
+      }
+    } else {
+      res.render("marcarFerias", {
+        errorMessage: "Periodo de férias inválido",
+      });
+    }
+  } else {
+    res.render("marcarFerias", {
+      errorMessage: "Data de ínicio de férias é inválida",
     });
-  } catch (error) {
-    console.error(error);
   }
 });
+
+function isDateValid(dateFirst, date_Second_or_today) {
+  let date = new Date(dateFirst);
+  if (date_Second_or_today == null) {
+    let date2 = new Date();
+    return date2.getTime() - date.getTime() < 0;
+  } else {
+    let date2 = new Date(date_Second_or_today);
+    return date.getTime() - date2.getTime() <= 0;
+  }
+}
+
+/*function isDateValid(dateFirst, date_Second_or_today) {
+  let date = dateFirst;
+  let date2 = date_Second_or_today;
+  if (date2 == null) {
+    date2 = new Date().getTime();
+    date = new Date(date[2], date[1] - 1, date[0]).getTime();
+    console.log("Date 1: " + date);
+    console.log("Date 2: " + date2);
+    return date2 - date < 0;
+  } else {
+    date2 = date2.split("/");
+    date = new Date(date[2], date[1] - 1, date[0]).getTime();
+    date2 = new Date(date2[2], date2[1] - 1, date2[0]).getTime();
+    console.log("Date 1: " + date);
+    console.log("Date 2: " + date2);
+    return date - date2 < 0;
+  }
+}*/
 
 module.exports = router;

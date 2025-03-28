@@ -5,3 +5,9 @@
     <h1 class="fs-4">Por Favor Faça Login</h1>
   {{/if}}
 </div>
+
+{{#if errorMessage}}
+  <script>
+    window.onload = function () { alert("{{errorMessage}}"); }
+  </script>
+{{/if}}

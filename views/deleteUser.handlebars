@@ -27,3 +27,9 @@
     </tr>
   {{/each}}
 </table>
+
+{{#if errorMessage}}
+  <script>
+    window.onload = function () { alert("{{errorMessage}}"); }
+  </script>
+{{/if}}

@@ -3,8 +3,8 @@
 </div>
 
 <form id="userCriation-form" action="/utilizadores/send-email" method="POST">
-  <div>
-    <label for="Utilizador_email">Endereço de Email:</label>
+  <div class="form-group required">
+    <label for="Utilizador_email" class="control-label">Endereço de Email:</label>
     <input
       id="Utilizador_email"
       name="Utilizador_email"
@@ -16,15 +16,14 @@
 
   <br />
 
-  <div>
-    <label for="Utilizador_cargo">Cargo:</label>
-    <input
-      name="Utilizador_cargo"
-      id="Utilizador_cargo"
-      type="text"
-      class="form-control"
-      required
-    />
+  <div class="form-group required">
+    <label for="Utilizador_cargo" class="control-label">Cargo:</label>
+    <select name="Utilizador_cargo" id="Utilizador_cargo" class="form-select">
+      <option value="Recursos Humanos">Recursos Humanos</option>
+      <option value="Design">Design</option>
+      <option value="Desenvolvedor">Desenvolvedor</option>
+      <option value="Produtor">Produtor</option>
+    </select required=>
   </div>
 
   <br />
@@ -49,3 +48,9 @@
   </div>
 
 </form>
+
+{{#if errorMessage}}
+  <script>
+    window.onload = function () { alert("{{errorMessage}}"); }
+  </script>
+{{/if}}

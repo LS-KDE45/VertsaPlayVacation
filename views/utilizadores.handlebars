@@ -23,7 +23,11 @@
             <td>N/A</td>
           {{/if}}
           <td>{{Utilizador_cargo}}</td>
-          <td>{{Utilizador_tipo}}</td>
+          {{#if Utilizador_tipo}}
+            <td>Sim</td>
+          {{else}}
+            <td>Não</td>
+          {{/if}}
         </tr>
       {{/each}}
     </table>

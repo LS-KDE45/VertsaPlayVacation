@@ -19,28 +19,21 @@
           <td>{{Ferias_ID}}</td>
           <td>{{Ferias_data_inicio}}</td>
           <td>{{Ferias_data_fim}}</td>
-          <td>{{lookup ../utilizadoresID @index}}</td>
-          <td>{{lookup ../utilizadoresnome @index}}</td>
-          <td>{{lookup ../utilizadoresemail @index}}</td>
-          <!--
-
-          {{#with (lookup ../utilizadoresData [@index])}}
-            <td>{{Utilizador_ID}}</td>
-            <td>{{Utilizador_nome}}</td>
-            <td>{{Utilizador_email}}</td>
-          {{/with}}
-
-
-          {{#each Utilizadore}}
-            <td>{{Utilizador_ID}}</td>
-            <td>{{Utilizador_nome}}</td>
-            <td>{{Utilizador_email}}</td>
-          {{/each}}
-          -->
+          {{#if ../tipo}}
+            <td>{{lookup ../utilizadoresID @index}}</td>
+            <td>{{lookup ../utilizadoresnome @index}}</td>
+            <td>{{lookup ../utilizadoresemail @index}}</td>
+          {{/if}}
         </tr>
       {{/each}}
     </table>
   {{else}}
-    <p id="Feriasp">Sem Ferias</p>
+    <p id="Feriasp">Sem Ferias Marcadas</p>
   {{/if}}
 </div>
+
+{{#if errorMessage}}
+  <script>
+    window.onload = function () { alert("{{errorMessage}}"); }
+  </script>
+{{/if}}

@@ -31,6 +31,11 @@
 
   <div>
     <button class="btn btn-secondary">Marcar</button>
-    <input type="submit" value="Send" />
   </div>
 </form>
+
+{{#if errorMessage}}
+  <script>
+    window.onload = function () { alert("{{errorMessage}}"); }
+  </script>
+{{/if}}
